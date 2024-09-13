@@ -6,6 +6,13 @@ from sys import argv
 import hashlib
 import json
 
+def compute_sha256(file_path):
+    sha256 = hashlib.sha256()
+    with file_path.open("rb") as f:
+        while chunk := f.read(8192):  # 逐块读取文件
+            sha256.update(chunk)
+    return sha256.hexdigest()
+
 if len(argv) != 2:
     print("ERROR: JSON info script requires output arg")
     exit(1)
@@ -37,8 +44,8 @@ def get_titles():
 
 
 device_id = getenv("DEVICE_ID")
-hash_file = hashlib.sha256(file_path.read_bytes()).hexdigest()
-
+#hash_file = hashlib.sha256(file_path.read_bytes()).hexdigest()
+hash_file = compute_sha256(file_path)
 if file_path.with_suffix(file_path.suffix + ".sha256sum").exists():
     hash_unsigned = (
         file_path.with_suffix(file_path.suffix + ".sha256sum").read_text().strip()
